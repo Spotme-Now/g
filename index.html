@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Invitación a un grupo · SpotMe</title>
+<meta property="og:title" content="Invitación a un grupo de SpotMe">
+<meta property="og:description" content="Únete al grupo desde la app SpotMe.">
+<style>
+  :root { --bg:#f4f4f6; --card:#fff; --fg:#1c1c1e; --muted:#6e6e73; --line:#e5e5ea; --btn:#1c1c1e; --btnfg:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#000; --card:#151517; --fg:#f2f2f7; --muted:#a1a1a6; --line:#2c2c2e; --btn:#f2f2f7; --btnfg:#000; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background:var(--bg); color:var(--fg);
+         font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding:16px; }
+  .card { width:100%; max-width:380px; background:var(--card); border:1px solid var(--line);
+          border-radius:20px; padding:28px 22px; text-align:center; }
+  h1 { font-size:1.35rem; margin:0 0 6px; font-weight:600; }
+  p { margin:0 0 14px; color:var(--muted); }
+  .code { font:600 1.6rem/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing:.12em;
+          padding:14px; border:1px dashed var(--line); border-radius:12px; margin:18px 0; color:var(--fg);
+          user-select:all; -webkit-user-select:all; }
+  a.btn, button { display:block; width:100%; padding:14px; border-radius:999px; border:0;
+                  background:var(--btn); color:var(--btnfg); font:600 1rem/1 inherit; text-decoration:none; cursor:pointer; }
+  button.secondary { background:transparent; color:var(--fg); border:1px solid var(--line); margin-top:10px; }
+  .small { font-size:.85rem; margin-top:18px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div id="ok" class="hidden">
+    <h1 data-t="title"></h1>
+    <p data-t="body"></p>
+    <div class="code" id="code"></div>
+    <a class="btn" id="open" data-t="open" href="#"></a>
+    <button class="secondary" id="copy" type="button" data-t="copy"></button>
+    <p class="small" data-t="manual"></p>
+    <p class="small" data-t="noapp"></p>
+  </div>
+  <div id="bad" class="hidden">
+    <h1 data-t="badTitle"></h1>
+    <p data-t="badBody"></p>
+  </div>
+</main>
+<script>
+(function () {
+  var T = {
+    es: { title: 'Te han invitado a un grupo', body: 'Ábrelo en SpotMe para pedir entrar.',
+          open: 'Abrir en SpotMe', copy: 'Copiar código', copied: 'Código copiado',
+          manual: 'Si no se abre, entra en la app, ve a Grupos › Tengo un código y escribe el código.',
+          noapp: '¿No tienes SpotMe? Pronto en App Store y Google Play.',
+          badTitle: 'Enlace no válido', badBody: 'Pide a quien te invitó que te lo vuelva a enviar.' },
+    ca: { title: 'T’han convidat a un grup', body: 'Obre’l a SpotMe per demanar entrar-hi.',
+          open: 'Obrir a SpotMe', copy: 'Copiar el codi', copied: 'Codi copiat',
+          manual: 'Si no s’obre, entra a l’app, ves a Grups › Tinc un codi i escriu el codi.',
+          noapp: 'No tens SpotMe? Aviat a l’App Store i Google Play.',
+          badTitle: 'Enllaç no vàlid', badBody: 'Demana a qui t’ha convidat que te’l torni a enviar.' },
+    en: { title: 'You’ve been invited to a group', body: 'Open it in SpotMe to ask to join.',
+          open: 'Open in SpotMe', copy: 'Copy code', copied: 'Code copied',
+          manual: 'If it doesn’t open, open the app, go to Groups › I have a code and enter the code.',
+          noapp: 'Don’t have SpotMe? Coming soon to the App Store and Google Play.',
+          badTitle: 'Invalid link', badBody: 'Ask the person who invited you to send it again.' }
+  };
+  var lang = (navigator.language || 'es').slice(0, 2).toLowerCase();
+  var t = T[lang] || (lang === 'es' ? T.es : T.en);
+  document.documentElement.lang = T[lang] ? lang : 'en';
+  document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t[el.getAttribute('data-t')]; });
+
+  var raw = new URLSearchParams(location.search).get('c') || '';
+  var code = raw.trim().toUpperCase();
+  if (!/^[A-Z0-9]{4,12}$/.test(code)) {
+    document.getElementById('bad').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('ok').classList.remove('hidden');
+  document.getElementById('code').textContent = code;
+  document.getElementById('open').href = 'spotme://group?code=' + encodeURIComponent(code);
+
+  var copyBtn = document.getElementById('copy');
+  copyBtn.addEventListener('click', function () {
+    var done = function () { copyBtn.textContent = t.copied; };
+    if (navigator.clipboard) { navigator.clipboard.writeText(code).then(done, function () {}); }
+  });
+})();
+</script>
+</body>
+</html>
